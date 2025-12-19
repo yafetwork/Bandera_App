@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore - Bandera</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+    
+    <style>
+        :root {
+            --ethiopian-green: #078930;
+            --ethiopian-yellow: #FFD700;
+            --ethiopian-red: #DA121A;
+            --warm-cream: #FAF7F0;
+            --charcoal-gray: #2C2C2C;
+            --soft-gray: #6B7280;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--warm-cream);
+            color: var(--charcoal-gray);
+        }
+        
+        .hero-explore {
+            background: linear-gradient(135deg, var(--ethiopian-green), var(--ethiopian-red));
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-explore::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('resources/hero-content-creation.png') center/cover;
+            opacity: 0.2;
+        }
+        
+        .search-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 16px 24px 16px 56px;
+            border: 2px solid transparent;
+            border-radius: 50px;
+            font-size: 16px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--ethiopian-green);
+            box-shadow: 0 4px 20px rgba(7, 137, 48, 0.2);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--soft-gray);
+        }
+        
+        .category-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+        }
+        
+        .category-card.food {
+            background: linear-gradient(135deg, #FF6B6B, #FFE66D);
+        }
+        
+        .category-card.fashion {
+            background: linear-gradient(135deg, #4ECDC4, #44A08D);
+        }
+        
+        .category-card.music {
+            background: linear-gradient(135deg, #A8E6CF, #7FCDCD);
+        }
+        
+        .category-card.events {
+            background: linear-gradient(135deg, #FFD93D, #FF6B6B);
+        }
+        
+        .category-card.landscapes {
+            background: linear-gradient(135deg, #6BCB77, #4D96FF);
+        }
+        
+        .category-card.culture {
+            background: linear-gradient(135deg, #9B5DE5, #F15BB5);
+        }
+        
+        .trending-item {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .trending-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        
+        .hashtag-tag {
+            background: linear-gradient(135deg, var(--ethiopian-green), var(--ethiopian-yellow));
+            color: white;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+            margin: 2px;
+        }
+        
+        .cultural-trend {
+            background: linear-gradient(135deg, var(--ethiopian-yellow), var(--ethiopian-red));
+            color: white;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .cultural-trend:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--ethiopian-yellow);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--ethiopian-yellow);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+        
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .stagger-1 { transition-delay: 0.1s; }
+        .stagger-2 { transition-delay: 0.2s; }
+        .stagger-3 { transition-delay: 0.3s; }
+        .stagger-4 { transition-delay: 0.4s; }
+        
+        .splide__arrow {
+            background: var(--ethiopian-green) !important;
+            opacity: 0.8;
+        }
+        
+        .splide__arrow:hover {
+            opacity: 1;
+        }
+        
+        .splide__pagination__page.is-active {
+            background: var(--ethiopian-green) !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-green-700 text-white z-50 backdrop-blur-sm">
+        <div class="max-w-6xl mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-8">
+                    <h1 class="text-2xl font-bold font-serif">Bandera</h1>
+                    <div class="hidden md:flex space-x-6">
+                        <a href="index.html" class="nav-link font-medium">Feed</a>
+                        <a href="explore.html" class="nav-link font-medium">Explore</a>
+                        <a href="profile.html" class="nav-link font-medium">Profile</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="p-2 rounded-full hover:bg-green-600 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5-5-5h5v-12"></path>
+                        </svg>
+                    </button>
+                    <button class="p-2 rounded-full hover:bg-green-600 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-explore pt-20 pb-16 text-white relative">
+        <div class="relative z-10 max-w-4xl mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                <span id="explore-typed"></span>
+            </h1>
+            <p class="text-xl opacity-90 mb-8">
+                Discover the richness of Ethiopian culture through our community's eyes
+            </p>
+            
+            <!-- Search Bar -->
+            <div class="search-container fade-in">
+                <div class="relative">
+                    <svg class="search-icon w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text" placeholder="Search Ethiopian culture, food, traditions..." class="search-input" id="exploreSearch">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cultural Categories -->
+    <section class="py-12 bg-white">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8 fade-in">Explore Categories</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                <div class="category-card food text-white p-6 fade-in stagger-1" data-category="food">
+                    <div class="text-4xl mb-4">🍽️</div>
+                    <h3 class="text-xl font-bold mb-2">Traditional Food</h3>
+                    <p class="opacity-90 text-sm">Discover authentic Ethiopian cuisine and recipes</p>
+                </div>
+                
+                <div class="category-card fashion text-white p-6 fade-in stagger-2" data-category="fashion">
+                    <div class="text-4xl mb-4">👗</div>
+                    <h3 class="text-xl font-bold mb-2">Cultural Fashion</h3>
+                    <p class="opacity-90 text-sm">Explore traditional Habesha clothing and modern interpretations</p>
+                </div>
+                
+                <div class="category-card music text-white p-6 fade-in stagger-3" data-category="music">
+                    <div class="text-4xl mb-4">🎵</div>
+                    <h3 class="text-xl font-bold mb-2">Music & Arts</h3>
+                    <p class="opacity-90 text-sm">Traditional instruments, music, and artistic expressions</p>
+                </div>
+                
+                <div class="category-card events text-white p-6 fade-in stagger-1" data-category="events">
+                    <div class="text-4xl mb-4">🎉</div>
+                    <h3 class="text-xl font-bold mb-2">Celebrations</h3>
+                    <p class="opacity-90 text-sm">Cultural festivals, holidays, and community gatherings</p>
+                </div>
+                
+                <div class="category-card landscapes text-white p-6 fade-in stagger-2" data-category="landscapes">
+                    <div class="text-4xl mb-4">🏔️</div>
+                    <h3 class="text-xl font-bold mb-2">Landscapes</h3>
+                    <p class="opacity-90 text-sm">Beautiful Ethiopian scenery and natural wonders</p>
+                </div>
+                
+                <div class="category-card culture text-white p-6 fade-in stagger-3" data-category="culture">
+                    <div class="text-4xl mb-4">🏛️</div>
+                    <h3 class="text-xl font-bold mb-2">Heritage</h3>
+                    <p class="opacity-90 text-sm">Historical sites, traditions, and cultural practices</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trending Content -->
+    <section class="py-12 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8 fade-in">Trending Now</h2>
+            
+            <!-- Cultural Trending Banner -->
+            <div class="cultural-trend mb-8 fade-in stagger-1">
+                <h3 class="text-2xl font-bold mb-2">🎉 Timkat Festival</h3>
+                <p class="text-lg opacity-90">Join the celebration of Ethiopia's most vibrant religious festival</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Trending Hashtags -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg fade-in stagger-2">
+                    <h3 class="text-xl font-bold mb-4">Trending Hashtags</h3>
+                    <div class="space-y-3">
+                        <div class="trending-item">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="font-semibold text-green-600">#EthiopianCoffee</div>
+                                    <div class="text-sm text-gray-600">2.3K posts</div>
+                                </div>
+                                <div class="text-2xl">☕</div>
+                            </div>
+                        </div>
+                        
+                        <div class="trending-item">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="font-semibold text-yellow-600">#HabeshaFashion</div>
+                                    <div class="text-sm text-gray-600">1.8K posts</div>
+                                </div>
+                                <div class="text-2xl">👗</div>
+                            </div>
+                        </div>
+                        
+                        <div class="trending-item">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="font-semibold text-red-600">#InjeraLove</div>
+                                    <div class="text-sm text-gray-600">1.5K posts</div>
+                                </div>
+                                <div class="text-2xl">🍽️</div>
+                            </div>
+                        </div>
+                        
+                        <div class="trending-item">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="font-semibold text-green-600">#EthiopianLandscapes</div>
+                                    <div class="text-sm text-gray-600">1.2K posts</div>
+                                </div>
+                                <div class="text-2xl">🏔️</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Popular Content -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg fade-in stagger-3">
+                    <h3 class="text-xl font-bold mb-4">Popular Content</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-4 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                            <img src="https://kimi-web-img.moonshot.cn/img/www.aspicyperspective.com/2168ff4c61b40edfb9a32b5cf1862bddf3c76809.jpg" alt="Traditional Food" class="w-16 h-16 rounded-lg object-cover">
+                            <div class="flex-1">
+                                <div class="font-semibold">Traditional Doro Wat Recipe</div>
+                                <div class="text-sm text-gray-600">by @ethiopian_chef</div>
+                                <div class="text-xs text-gray-500">1.2K likes • 234 comments</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                            <img src="https://kimi-web-img.moonshot.cn/img/ethiopiantraditionaldress.com/8d13b3bbba824075c84ac361e5917c4db12fd681.jpg" alt="Habesha Kemis" class="w-16 h-16 rounded-lg object-cover">
+                            <div class="flex-1">
+                                <div class="font-semibold">Modern Habesha Fashion</div>
+                                <div class="text-sm text-gray-600">by @habesha_style</div>
+                                <div class="text-xs text-gray-500">987 likes • 156 comments</div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                            <img src="https://kimi-web-img.moonshot.cn/img/cdn1.matadornetwork.com/34e8fb0fca6ec772e1b667feb1076a35b0f4dfcd.jpg" alt="Ethiopian Landscape" class="w-16 h-16 rounded-lg object-cover">
+                            <div class="flex-1">
+                                <div class="font-semibold">Simien Mountains Adventure</div>
+                                <div class="text-sm text-gray-600">by @ethiopia_explorer</div>
+                                <div class="text-xs text-gray-500">1.8K likes • 342 comments</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cultural Education -->
+    <section class="py-12 bg-white">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8 fade-in">Learn About Ethiopian Culture</h2>
+            
+            <div class="splide" id="education-carousel">
+                <div class="splide__track">
+                    <ul class="splide__list">
+                        <li class="splide__slide">
+                            <div class="bg-gradient-to-br from-green-400 to-green-600 text-white rounded-2xl p-8 mx-2">
+                                <div class="text-4xl mb-4">☕</div>
+                                <h3 class="text-2xl font-bold mb-4">Coffee Ceremony</h3>
+                                <p class="text-lg opacity-90 mb-4">
+                                    The Ethiopian coffee ceremony is a cornerstone of social life, 
+                                    involving the roasting, grinding, and brewing of coffee beans 
+                                    while friends and family gather to share stories.
+                                </p>
+                                <button class="bg-white text-green-600 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition-colors">
+                                    Learn More
+                                </button>
+                            </div>
+                        </li>
+                        
+                        <li class="splide__slide">
+                            <div class="bg-gradient-to-br from-yellow-400 to-yellow-600 text-white rounded-2xl p-8 mx-2">
+                                <div class="text-4xl mb-4">👗</div>
+                                <h3 class="text-2xl font-bold mb-4">Habesha Kemis</h3>
+                                <p class="text-lg opacity-90 mb-4">
+                                    The traditional Ethiopian dress, worn with pride during celebrations 
+                                    and cultural events. Each region has its unique style and embroidery patterns 
+                                    that tell stories of heritage and identity.
+                                </p>
+                                <button class="bg-white text-yellow-600 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition-colors">
+                                    Explore Fashion
+                                </button>
+                            </div>
+                        </li>
+                        
+                        <li class="splide__slide">
+                            <div class="bg-gradient-to-br from-red-400 to-red-600 text-white rounded-2xl p-8 mx-2">
+                                <div class="text-4xl mb-4">🍽️</div>
+                                <h3 class="text-2xl font-bold mb-4">Injera & Wot</h3>
+                                <p class="text-lg opacity-90 mb-4">
+                                    Injera, the spongy flatbread made from teff flour, serves as both 
+                                    plate and utensil for various wots (stews). This communal dining 
+                                    experience brings families together in tradition.
+                                </p>
+                                <button class="bg-white text-red-600 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition-colors">
+                                    Discover Recipes
+                                </button>
+                            </div>
+                        </li>
+                        
+                        <li class="splide__slide">
+                            <div class="bg-gradient-to-br from-purple-400 to-purple-600 text-white rounded-2xl p-8 mx-2">
+                                <div class="text-4xl mb-4">🎉</div>
+                                <h3 class="text-2xl font-bold mb-4">Timkat Festival</h3>
+                                <p class="text-lg opacity-90 mb-4">
+                                    Ethiopia's most colorful religious festival, celebrating the baptism 
+                                    of Jesus Christ with processions, traditional music, and vibrant 
+                                    cultural displays across the country.
+                                </p>
+                                <button class="bg-white text-purple-600 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition-colors">
+                                    Join Celebration
+                                </button>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Highlights -->
+    <section class="py-12 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-8 fade-in">Community Highlights</h2>
+            
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-2xl p-6 shadow-lg text-center fade-in stagger-1">
+                    <div class="text-4xl mb-4">🏆</div>
+                    <h3 class="text-xl font-bold mb-2">Cultural Ambassador</h3>
+                    <p class="text-gray-600 mb-4">Recognizing community members who share authentic Ethiopian culture</p>
+                    <div class="flex items-center justify-center space-x-2">
+                        <img src="https://kimi-web-img.moonshot.cn/img/ethiopiantraditionaldress.com/8d13b3bbba824075c84ac361e5917c4db12fd681.jpg" alt="Ambassador" class="w-8 h-8 rounded-full object-cover">
+                        <span class="text-sm font-semibold">Selamawit M.</span>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-2xl p-6 shadow-lg text-center fade-in stagger-2">
+                    <div class="text-4xl mb-4">📸</div>
+                    <h3 class="text-xl font-bold mb-2">Photo of the Week</h3>
+                    <p class="text-gray-600 mb-4">Stunning capture of Ethiopian landscapes and cultural moments</p>
+                    <img src="https://kimi-web-img.moonshot.cn/img/cdn1.matadornetwork.com/34e8fb0fca6ec772e1b667feb1076a35b0f4dfcd.jpg" alt="Photo of the Week" class="w-full h-32 object-cover rounded-lg">
+                </div>
+                
+                <div class="bg-white rounded-2xl p-6 shadow-lg text-center fade-in stagger-3">
+                    <div class="text-4xl mb-4">🌟</div>
+                    <h3 class="text-xl font-bold mb-2">Rising Creator</h3>
+                    <p class="text-gray-600 mb-4">New members making significant cultural contributions</p>
+                    <div class="flex items-center justify-center space-x-2">
+                        <img src="https://kimi-web-img.moonshot.cn/img/i0.wp.com/3fd7300788592dd80e9799141811b97b4c1d86c6.jpg" alt="Rising Creator" class="w-8 h-8 rounded-full object-cover">
+                        <span class="text-sm font-semibold">Kidus A.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bottom Navigation (Mobile) -->
+    <nav class="fixed bottom-0 w-full bg-white border-t border-gray-200 md:hidden z-50">
+        <div class="flex justify-around py-2">
+            <a href="index.html" class="flex flex-col items-center p-2 text-gray-600">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+                <span class="text-xs">Feed</span>
+            </a>
+            <a href="explore.html" class="flex flex-col items-center p-2 text-green-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <span class="text-xs">Explore</span>
+            </a>
+            <a href="profile.html" class="flex flex-col items-center p-2 text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                <span class="text-xs">Profile</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Footer -->
+    <footer class="bg-green-700 text-white py-8 mt-16">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <h3 class="text-2xl font-bold mb-4">Bandera</h3>
+            <p class="mb-4">Celebrating Ethiopian culture through community connection</p>
+            <p class="text-sm opacity-75">© 2025 Bandera. Proudly celebrating Ethiopian heritage.</p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script src="main-api.js"></script>
+</body>
+</html>
